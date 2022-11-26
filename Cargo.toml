@@ -1,0 +1,33 @@
+[package]
+name = "system-events"
+version = "0.1.0"
+edition = "2021"
+authors = ["maxu <imxood@163.com>"]
+homepage = "https://github.com/imxood/system-events"
+repository = "https://github.com/imxood/system-events"
+keywords = ["system", "monitor", "event"]
+readme = "Readme.md"
+license = "MIT"
+description = "system events monitor"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossbeam-channel = "0.5.6"
+lazy_static = "1.4.0"
+serde = { version = "1.0.147", features = ["derive"] }
+
+[dependencies.windows]
+version = "0.43"
+features = [
+    "Win32_System_LibraryLoader",
+    "Win32_Graphics_Gdi",
+    "Data_Xml_Dom",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Power",
+    "Win32_System_Threading",
+    "Win32_System_SystemServices",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Shell",
+]
