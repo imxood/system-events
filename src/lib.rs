@@ -18,6 +18,7 @@ pub trait Monitor {
     fn into_inner(self) -> Receiver<SystemEvent>;
     fn try_recv(&self) -> Option<SystemEvent>;
     fn recv(&self, timeout: Option<Duration>) -> Option<SystemEvent>;
+    fn recv_ref(&self) -> &Receiver<SystemEvent>;
 }
 
 #[cfg(target_os = "windows")]
