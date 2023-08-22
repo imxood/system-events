@@ -5,21 +5,17 @@ use lazy_static::lazy_static;
 use std::{ffi::c_void, mem::size_of, os::windows::prelude::OsStrExt, time::Duration};
 use windows::Win32::Foundation::HWND;
 use windows::Win32::Foundation::LRESULT;
-use windows::Win32::System::SystemServices::{
-    DBT_DEVICEARRIVAL, DBT_DEVICEREMOVECOMPLETE, DBT_DEVNODES_CHANGED,
+use windows::Win32::UI::WindowsAndMessaging::{
+    DBT_DEVICEARRIVAL, DBT_DEVICEREMOVECOMPLETE, DBT_DEVNODES_CHANGED, DBT_DEVTYP_DEVICEINTERFACE,
+    DEV_BROADCAST_DEVICEINTERFACE_W, HMENU, REGISTER_NOTIFICATION_FLAGS,
 };
-use windows::Win32::UI::WindowsAndMessaging::HMENU;
-use windows::Win32::UI::WindowsAndMessaging::MSG;
+use windows::Win32::UI::WindowsAndMessaging::{DEVICE_NOTIFY_WINDOW_HANDLE, MSG};
 use windows::{
     core::PCWSTR,
     Win32::{
         Foundation::{HANDLE, LPARAM, WPARAM},
         Graphics::Gdi::HBRUSH,
-        System::{
-            LibraryLoader::GetModuleHandleW,
-            Power::{DEVICE_NOTIFY_WINDOW_HANDLE, POWER_SETTING_REGISTER_NOTIFICATION_FLAGS},
-            SystemServices::{DBT_DEVTYP_DEVICEINTERFACE, DEV_BROADCAST_DEVICEINTERFACE_W},
-        },
+        System::LibraryLoader::GetModuleHandleW,
         UI::WindowsAndMessaging::HICON,
         UI::{
             Shell::{DefSubclassProc, SetWindowSubclass},
@@ -57,10 +53,14 @@ impl Monitor for WindowsSystemMonitor {
             .recv_timeout(timeout.unwrap_or(Duration::MAX))
             .ok()
     }
+
+    fn recv_ref(&self) -> &Receiver<SystemEvent> {
+        &self.event_receiver
+    }
 }
 
-impl WindowsSystemMonitor {
-    pub fn new() -> Self {
+impl Default for WindowsSystemMonitor {
+    fn default() -> Self {
         let (tx, rx) = bounded::<isize>(1);
         let (event_sender, event_receiver) = bounded::<SystemEvent>(10);
 
@@ -73,7 +73,9 @@ impl WindowsSystemMonitor {
             window_hwnd,
         }
     }
+}
 
+impl WindowsSystemMonitor {
     // 注册 设备改变 事件
     pub fn register_dev_changed_event(&self) {
         let mut notify_filter = DEV_BROADCAST_DEVICEINTERFACE_W::default();
@@ -89,8 +91,8 @@ impl WindowsSystemMonitor {
             RegisterDeviceNotificationW(
                 HANDLE(self.window_hwnd),
                 &notify_filter as *const DEV_BROADCAST_DEVICEINTERFACE_W as *const c_void,
-                POWER_SETTING_REGISTER_NOTIFICATION_FLAGS(
-                    DEVICE_NOTIFY_WINDOW_HANDLE.0 | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES,
+                REGISTER_NOTIFICATION_FLAGS(
+                    DEVICE_NOTIFY_WINDOW_HANDLE.0 | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES.0,
                 ),
             );
         }
@@ -232,6 +234,7 @@ unsafe extern "system" fn window_proc(
                 );
             }
         }
+        // println!("wparam: {wparam:?}  lparam: {lparam:?}");
         return LRESULT(0);
     }
 
