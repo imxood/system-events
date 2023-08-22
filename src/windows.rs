@@ -177,7 +177,7 @@ fn create_event_window(tx: Sender<isize>, event_sender: Sender<SystemEvent>) {
         }
 
         unsafe {
-            SetWindowLongPtrW(window, GWL_STYLE, (WS_VISIBLE | WS_POPUP).0 as isize);
+            SetWindowLongPtrW(window, GWL_STYLE, (WS_VISIBLE | WS_POPUP).0 as _);
         }
 
         // 消息处理

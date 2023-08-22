@@ -84,7 +84,7 @@ dependencies = [
 
 [[package]]
 name = "system-events"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "crossbeam-channel",
  "lazy_static",
