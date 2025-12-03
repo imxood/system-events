@@ -1,7 +1,7 @@
 [package]
 name = "system-events"
-version = "0.1.0"
-edition = "2021"
+version = "0.2.0"
+edition = "2024"
 authors = ["maxu <imxood@163.com>"]
 homepage = "https://github.com/imxood/system-events"
 repository = "https://github.com/imxood/system-events"
@@ -13,13 +13,10 @@ description = "system events monitor"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crossbeam-channel = "0.5.6"
-lazy_static = "1.4.0"
-serde = { version = "1.0.147", features = ["derive"] }
+crossbeam-channel = "0.5.15"
 
-[dependencies.windows]
-version = "0.48"
-features = [
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.62", features = [
     "Win32_System_LibraryLoader",
     "Win32_Graphics_Gdi",
     "Data_Xml_Dom",
@@ -28,6 +25,12 @@ features = [
     "Win32_System_Power",
     "Win32_System_Threading",
     "Win32_System_SystemServices",
+    "Win32_System_Ioctl",
     "Win32_UI_WindowsAndMessaging",
     "Win32_UI_Shell",
-]
+    "Win32_Devices",
+    "Win32_Devices_DeviceAndDriverInstallation",
+    "Win32_Networking_WinSock",
+    "Win32_NetworkManagement",
+    "Win32_NetworkManagement_IpHelper",
+] }

@@ -23,3 +23,19 @@ pub trait Monitor {
 
 #[cfg(target_os = "windows")]
 pub type SystemMonitor = WindowsSystemMonitor;
+
+pub struct EventNotify<T> {
+    notify: Box<dyn Fn(T)>,
+}
+
+impl<T> EventNotify<T> {
+    pub fn new(notify: Box<dyn Fn(T)>) -> Self {
+        Self { notify }
+    }
+
+    pub fn exec(&self, param: T) {
+        (self.notify)(param);
+    }
+}
+
+unsafe impl<T> Send for EventNotify<T> {}
